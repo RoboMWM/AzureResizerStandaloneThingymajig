@@ -1,17 +1,16 @@
 package com.robomwm.test;
 
-import com.microsoft.azure.credentials.AzureTokenCredentials;
 import com.microsoft.azure.management.Azure;
-import com.microsoft.azure.management.compute.DiskInstanceView;
-import com.microsoft.azure.management.compute.InstanceViewStatus;
 import com.microsoft.azure.management.compute.VirtualMachine;
 import com.microsoft.azure.management.compute.VirtualMachineSizeTypes;
 import com.microsoft.rest.LogLevel;
 import org.apache.log4j.BasicConfigurator;
-import rx.Observable;
 
 import java.io.File;
-import java.io.InputStream;
+import java.time.Instant;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Scanner;
 
 /**
@@ -26,6 +25,30 @@ public class Test
         BasicConfigurator.configure();
         try
         {
+            boolean isWithinPeakHours = false;
+
+            //https://stackoverflow.com/a/39712175
+            try
+            {
+                System.out.println(ZoneOffset.getAvailableZoneIds());
+                ZoneOffset zone = ZoneId.of("US/Pacific").getRules().getOffset(Instant.now());
+                OffsetTime start = OffsetTime.of(14, 0, 0, 0, zone);
+                OffsetTime stop = OffsetTime.of(23, 0, 0, 0, zone);
+                OffsetTime now = OffsetTime.now(zone);
+                isWithinPeakHours = now.isAfter(start) && now.isBefore(stop);
+                System.out.println(start);
+                System.out.println(stop);
+                System.out.println(now);
+                System.out.println(now.isAfter(start));
+                System.out.println(now.isBefore(stop));
+                System.out.println(isWithinPeakHours);
+                System.out.println(zone);
+            }
+            catch (Throwable rock)
+            {
+                rock.printStackTrace();
+            }
+
             final File credFile = new File(System.getProperty("user.dir") +
                     File.separator + "plugins" +
                     File.separator + "AzureResizer" +
@@ -43,7 +66,12 @@ public class Test
             System.out.println(azure.subscriptions());
             VirtualMachine vm = azure.virtualMachines().getByResourceGroup("linux2", "linux2");
             if (vm.size() == VirtualMachineSizeTypes.STANDARD_B1S)
-                vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B1MS).apply();
+            {
+                if (isWithinPeakHours)
+                    vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B2S).apply();
+                else
+                    vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B1MS).apply();
+            }
             else
                 vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B1S).apply();
             System.out.println("updating");
