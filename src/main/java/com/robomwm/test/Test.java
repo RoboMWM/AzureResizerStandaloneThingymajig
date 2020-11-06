@@ -30,23 +30,24 @@ public class Test
             //https://stackoverflow.com/a/39712175
             try
             {
-                System.out.println(ZoneOffset.getAvailableZoneIds());
+//                System.out.println(ZoneOffset.getAvailableZoneIds());
                 ZoneOffset zone = ZoneId.of("US/Pacific").getRules().getOffset(Instant.now());
                 OffsetTime start = OffsetTime.of(14, 0, 0, 0, zone);
                 OffsetTime stop = OffsetTime.of(23, 0, 0, 0, zone);
                 OffsetTime now = OffsetTime.now(zone);
                 isWithinPeakHours = now.isAfter(start) && now.isBefore(stop);
-                System.out.println(start);
-                System.out.println(stop);
-                System.out.println(now);
-                System.out.println(now.isAfter(start));
-                System.out.println(now.isBefore(stop));
-                System.out.println(isWithinPeakHours);
-                System.out.println(zone);
+                System.out.println("start " + start);
+                System.out.println("stop " + stop);
+                System.out.println("now " + now);
+                System.out.println("now.isAfter " + now.isAfter(start));
+                System.out.println("now.isBefore " + now.isBefore(stop));
+                System.out.println("isWithinPeakHours " + isWithinPeakHours);
+                System.out.println("zone " + zone);
             }
             catch (Throwable rock)
             {
                 rock.printStackTrace();
+                System.out.println("peak hours calculation failed");
             }
 
             final File credFile = new File(System.getProperty("user.dir") +
@@ -59,22 +60,32 @@ public class Test
                 System.out.println(data);
             }
             Azure azure = Azure.configure()
-                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                    .withLogLevel(LogLevel.BASIC)
                     .authenticate(credFile)
                     .withDefaultSubscription();
             System.out.println("credentialed in");
             System.out.println(azure.subscriptions());
             VirtualMachine vm = azure.virtualMachines().getByResourceGroup("linux2", "linux2");
+            System.out.println("updating");
             if (vm.size() == VirtualMachineSizeTypes.STANDARD_B1S)
             {
                 if (isWithinPeakHours)
+                {
+                    System.out.println("to B2s");
                     vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B2S).apply();
+                }
                 else
+                {
+                    System.out.println("to B1ms");
                     vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B1MS).apply();
+                }
             }
             else
+            {
+                System.out.println("back to B1s");
                 vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B1S).apply();
-            System.out.println("updating");
+            }
+
             //new ResizeThread(vm, VirtualMachineSizeTypes.STANDARD_B1S).start();
             System.out.println("started");
 //            for (int i = 0; i < Integer.MAX_VALUE; i++)
@@ -145,20 +156,20 @@ public class Test
 
     }
 }
-class ResizeThread extends Thread
-{
-    private VirtualMachine vm;
-    private VirtualMachineSizeTypes type;
-
-    public ResizeThread(VirtualMachine vm, VirtualMachineSizeTypes type)
-    {
-        this.vm = vm;
-        this.type = type;
-    }
-
-    @Override
-    public void run()
-    {
-        vm.update().withSize(type).applyAsync();
-    }
-}
+//class ResizeThread extends Thread
+//{
+//    private VirtualMachine vm;
+//    private VirtualMachineSizeTypes type;
+//
+//    public ResizeThread(VirtualMachine vm, VirtualMachineSizeTypes type)
+//    {
+//        this.vm = vm;
+//        this.type = type;
+//    }
+//
+//    @Override
+//    public void run()
+//    {
+//        vm.update().withSize(type).applyAsync();
+//    }
+//}
