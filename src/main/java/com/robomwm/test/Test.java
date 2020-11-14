@@ -54,11 +54,6 @@ public class Test
                     File.separator + "plugins" +
                     File.separator + "AzureResizer" +
                     File.separator + "creds.properties");
-            Scanner myReader = new Scanner(credFile);
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
-            }
             Azure azure = Azure.configure()
                     .withLogLevel(LogLevel.BASIC)
                     .authenticate(credFile)
