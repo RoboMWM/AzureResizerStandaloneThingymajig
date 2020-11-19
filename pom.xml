@@ -12,8 +12,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <name>test</name>
-    <url>http://maven.apache.org</url>
     <build>
         <finalName>${project.name}</finalName>
         <plugins>

@@ -32,8 +32,8 @@ public class Test
             {
 //                System.out.println(ZoneOffset.getAvailableZoneIds());
                 ZoneOffset zone = ZoneId.of("US/Pacific").getRules().getOffset(Instant.now());
-                OffsetTime start = OffsetTime.of(14, 0, 0, 0, zone);
-                OffsetTime stop = OffsetTime.of(23, 0, 0, 0, zone);
+                OffsetTime start = OffsetTime.of(11, 0, 0, 0, zone);
+                OffsetTime stop = OffsetTime.of(21, 0, 0, 0, zone);
                 OffsetTime now = OffsetTime.now(zone);
                 isWithinPeakHours = now.isAfter(start) && now.isBefore(stop);
                 System.out.println("start " + start);
