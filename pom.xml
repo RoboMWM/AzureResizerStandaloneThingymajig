@@ -15,6 +15,7 @@
     <name>test</name>
     <url>http://maven.apache.org</url>
     <build>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
