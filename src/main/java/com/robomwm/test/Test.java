@@ -59,7 +59,6 @@ public class Test
                     .authenticate(credFile)
                     .withDefaultSubscription();
             System.out.println("credentialed in");
-            System.out.println(azure.subscriptions());
             VirtualMachine vm = azure.virtualMachines().getByResourceGroup("linux2", "linux2");
             System.out.println("updating");
             if (vm.size() == VirtualMachineSizeTypes.STANDARD_B1S)
