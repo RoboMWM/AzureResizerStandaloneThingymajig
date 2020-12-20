@@ -65,8 +65,8 @@ public class Test
             {
                 if (isWithinPeakHours)
                 {
-                    System.out.println("to B2s");
-                    vm.update().withSize(VirtualMachineSizeTypes.STANDARD_B2S).apply();
+                    System.out.println("to F1s");
+                    vm.update().withSize(VirtualMachineSizeTypes.STANDARD_F1S).apply();
                 }
                 else
                 {
